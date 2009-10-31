@@ -17,10 +17,10 @@ alphabet = [ 'a' .. 'z' ]
 
 edits1 word =
     let s = [ (take i word, drop i word) | i <- [ 0 .. length word ] ]
-        deletes    = [ a ++ tail b | (a, b) <- s, not $ null b ]
-        transposes = [ a ++ (b!!1 : b!!0 : drop 2 b) | (a, b) <- s, not $ null b, not $ null $ tail b ]
-        replaces   = [ a ++ (c : tail b) | (a, b) <- s, c <- alphabet, not $ null b ]
-        inserts    = [ a ++ (c : b) | (a, b) <- s, c <- alphabet ]
+        deletes    = [ a ++ b | (a, _ : b) <- s ]
+        transposes = [ a ++ b2 : b1 : b3 | (a, b1 : b2 : b3) <- s ]
+        replaces   = [ a ++ c : b | (a, _ : b) <- s, c <- alphabet ]
+        inserts    = [ a ++ c : b | (a, b) <- s, c <- alphabet ]
     in Set.fromList (deletes ++ transposes ++ replaces ++ inserts)
 
 known_edits2 knownWords = Set.unions . Set.elems . Set.map (Set.intersection knownWords . edits1) . edits1
