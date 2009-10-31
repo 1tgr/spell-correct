@@ -1,7 +1,9 @@
 module Main where
 
 import Char  
+import qualified Data.List as List
 import qualified Data.Map as Map
+import Data.Ord
 import IO
 import List
 
@@ -11,10 +13,7 @@ lowerWords = filter (not . null)
            . words
 
 train :: [ String ] -> Map.Map String Int
-train = foldl (flip (Map.alter incrementWord)) Map.empty
-    where incrementWord :: Maybe Int -> Maybe Int
-          incrementWord (Just n) = Just $ n + 1
-          incrementWord Nothing = Just 1
+train = List.foldl' (\dict f -> Map.insertWith' (+) f 1 dict) Map.empty 
 
 alphabet :: String
 alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -43,7 +42,7 @@ correct nwords word =
                                                   l -> l
                                       l -> l
                           l -> l
-    in maximumBy (\a b -> compare (Map.findWithDefault undefined a nwords) (Map.findWithDefault undefined b nwords)) candidates
+    in maximumBy (comparing (\c -> Map.findWithDefault undefined c nwords)) candidates
 
 prompt :: Map.Map String Int -> IO ()
 prompt nwords = do
@@ -58,6 +57,6 @@ prompt nwords = do
 
 main :: IO ()
 main =
-    readFile "small.txt" >>= return 
-                           . train 
-                           . lowerWords >>= prompt
+    readFile "big.txt" >>= return 
+                         . train 
+                         . lowerWords >>= prompt
