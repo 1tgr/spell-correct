@@ -1,4 +1,4 @@
-module Tim.Spell.Correct.Tests where
+module Tim.Spell.Tests where
 
 import qualified Data.Map as Map
 import HUnit

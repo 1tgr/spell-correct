@@ -1,4 +1,4 @@
-module Tim.Spell.Correct.Demo where
+module Tim.Spell.Demo where
 
 import Data.Map
 import IO
