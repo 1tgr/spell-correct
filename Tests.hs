@@ -7,15 +7,12 @@ import Tim.Spell.Correct
 
 tests1 :: [ (String, String) ]
 tests1 = [ ("access", "acess"), 
-           ("accessing", "accesing"), 
-           ("accommodation", "accomodation acommodation acomodation"), 
-           ("account", "acount") ]
+           ("accommodation", "accomodation acommodation acomodation") ]
 
 tests2 :: [ (String, String) ]
 tests2 = [ ("forbidden", "forbiden"), 
            ("decisions", "deciscions descisions"),
-           ("supposedly", "supposidly"),
-           ("embellishing", "embelishing") ]
+           ("supposedly", "supposidly") ]
 
 doTest :: Map.Map String Int -> [ (String, String) ] -> Test
 doTest nwords corrections = actualCorrections ~?= expectedCorrections
