@@ -28,9 +28,11 @@ edits1 word =
     in Set.fromList (deletes ++ transposes ++ replaces ++ inserts)
 
 known_edits2 :: Map.Map String Int -> String -> Set.Set String
-known_edits2 nwords word = Set.fromList [ e2 | e1 <- Set.elems $ edits1 word, 
-                                               e2 <- Set.elems $ edits1 e1, 
-                                               Map.member e1 nwords ]
+known_edits2 nwords word = Set.unions 
+                         $ map edits1 
+                         $ Set.elems
+                         $ Set.intersection (Map.keysSet nwords) 
+                         $ edits1 word
 
 known :: Map.Map String Int -> Set.Set String -> Set.Set String
 known nwords = Set.intersection (Map.keysSet nwords)
