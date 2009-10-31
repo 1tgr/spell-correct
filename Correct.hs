@@ -7,18 +7,14 @@ import qualified Data.Set as Set
 import Data.Ord
 import List
 
-lowerWords :: String -> [ String ]
-lowerWords = filter (not . null)
-           . map (map toLower . filter isAlpha) 
-           . words
+lowerWords = filter (not . null) . map (map toLower . filter isAlpha) . words
 
-train :: [ String ] -> Map.Map String Int
-train = List.foldl' (\dict word -> Map.insertWith' (+) word 1 dict) Map.empty 
+train = List.foldl' (\dict word -> Map.insertWith' (+) word (1::Int) dict) Map.empty 
 
-alphabet :: String
-alphabet = "abcdefghijklmnopqrstuvwxyz"
+readNWORDS = readFile "big.txt" >>= return . train . lowerWords
 
-edits1 :: String -> Set.Set String
+alphabet = [ 'a' .. 'z' ]
+
 edits1 word =
     let s = [ (take i word, drop i word) | i <- [ 0 .. length word ] ]
         deletes    = [ a ++ tail b | (a, b) <- s, not $ null b ]
@@ -27,27 +23,15 @@ edits1 word =
         inserts    = [ a ++ (c : b) | (a, b) <- s, c <- alphabet ]
     in Set.fromList (deletes ++ transposes ++ replaces ++ inserts)
 
-known_edits2 :: Map.Map String Int -> String -> Set.Set String
-known_edits2 nwords = Set.unions 
-                    . Set.elems
-                    . Set.map (Set.intersection knownWords . edits1)
-                    . edits1
-    where knownWords = Map.keysSet nwords
+known_edits2 knownWords = Set.unions . Set.elems . Set.map (Set.intersection knownWords . edits1) . edits1
 
-known :: Map.Map String Int -> Set.Set String -> Set.Set String
-known nwords = Set.intersection (Map.keysSet nwords)
-
-correct :: Map.Map String Int -> String -> String
-correct nwords word = maximumBy (comparing (\w -> w `Map.lookup` nwords))
-                    $ Set.elems
-                    $ head
-                    $ filter (not . Set.null)
-                    $ [ known nwords $ Set.singleton word,
-                        known nwords $ edits1 word,
-                        known_edits2 nwords word,
-                        Set.singleton word ]
-
-readNWORDS :: IO (Map.Map String Int)
-readNWORDS = readFile "big.txt" >>= return 
-                                  . train 
-                                  . lowerWords
+correct nwords word = 
+    let knownWords = Map.keysSet nwords
+        candidates = Set.elems
+                   $ head
+                   $ filter (not . Set.null)
+                   $ [ Set.intersection knownWords $ Set.singleton word,
+                       Set.intersection knownWords $ edits1 word,
+                       known_edits2 knownWords word,
+                       Set.singleton word ]
+      in maximumBy (comparing (\w -> w `Map.lookup` nwords)) candidates
